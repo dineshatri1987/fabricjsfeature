@@ -6,6 +6,7 @@ var isFlip = false;
 var svgData = null;
 var line = [];
 var line2 = null;
+var newImages = [];
 // create a rect object
 var deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E";
 
@@ -209,8 +210,8 @@ function flip() {
     if (svgData) {
         svgData._objects.forEach(function (path) {
             if (path.id.indexOf('Text') > -1) {
-                path.set("angle", "-360").set("SkewX","-360");
-                path.transformMatrix = [ -1, 0, 0, 1, 0, 0 ];
+                path.set("angle", "-360").set("SkewX", "-360");
+                path.transformMatrix = [-1, 0, 0, 1, 0, 0];
                 path.setCoords();
             }
         });
@@ -221,10 +222,17 @@ function flip() {
     if (line && line.length) {
         debugger
         line.forEach((item) => {
-            item.set("angle", "-360").set('flipX', true);
+            item.set("angle", "-360").set('flipX', isFlip);
             item.setCoords();
         });
 
+    }
+
+    if (newImages && newImages.length) {
+        newImages.forEach((item) => { 
+            item.set('flipX', isFlip);
+            item.setCoords();
+        });
     }
     //canvas.set('flipX', isFlip);
     canvas.renderAll();
@@ -262,20 +270,19 @@ function handleDragStart(e) {
 
 function handleDrop(e) {
     if (e.preventDefault) {
-      e.preventDefault(); 
+        e.preventDefault();
     }
-    
+
     if (e.stopPropagation) {
         e.stopPropagation(); // stops the browser from redirecting.
     }
 
     var img = document.querySelector('#images img.img_dragging');
-		
+
     // console.log('event: ', e);
 
     var newImage = new fabric.Image(img, {
-        width: 100,
-        height: 100,
+
         // Set the center of the new object based on the event coordinates relative
         // to the canvas container.
         left: e.layerX,
@@ -284,6 +291,8 @@ function handleDrop(e) {
     newImage.scaleToHeight(100);
     newImage.scaleToWidth(100);
     canvas.add(newImage);
+    canvas.bringToFront(newImage);
+    newImages.push(newImage);
 
     return false;
 }
@@ -296,17 +305,17 @@ function handleDragEnd(e) {
 }
 
 //if (Modernizr.draganddrop) {
-    // Browser supports HTML5 DnD.
+// Browser supports HTML5 DnD.
 
-    // Bind the event listeners for the image elements
-    var images = document.querySelectorAll('#images img');
-    [].forEach.call(images, function (img) {
-        img.addEventListener('dragstart', handleDragStart, false);
-        img.addEventListener('dragend', handleDragEnd, false);
-    });
-    // Bind the event listeners for the canvas
-    var canvasContainer = document.getElementById('canvas-container');
-    canvasContainer.addEventListener('drop', handleDrop, false);
+// Bind the event listeners for the image elements
+var images = document.querySelectorAll('#images img');
+[].forEach.call(images, function (img) {
+    img.addEventListener('dragstart', handleDragStart, false);
+    img.addEventListener('dragend', handleDragEnd, false);
+});
+// Bind the event listeners for the canvas
+var canvasContainer = document.getElementById('canvas-container');
+canvasContainer.addEventListener('drop', handleDrop, false);
 // } else {
 //     // Replace with a fallback to a library solution.
 //     alert("This browser doesn't support the HTML5 Drag and Drop API.");
