@@ -210,7 +210,7 @@ function flip() {
     if (svgData) {
         svgData._objects.forEach(function (path) {
             if (path.id.indexOf('Text') > -1) {
-                path.set("angle", "-360").set("SkewX", "-360");
+                path.set("angle", "-360").set('flipX', isFlip);
                 path.transformMatrix = [-1, 0, 0, 1, 0, 0];
                 path.setCoords();
             }
@@ -222,7 +222,8 @@ function flip() {
     if (line && line.length) {
         debugger
         line.forEach((item) => {
-            item.set("angle", "-360").set('flipX', isFlip);
+            var flip = item.get('flipX');
+            item.set("angle", "-360").set('flipX', !flip);
             item.setCoords();
         });
 
@@ -230,7 +231,8 @@ function flip() {
 
     if (newImages && newImages.length) {
         newImages.forEach((item) => { 
-            item.set('flipX', isFlip);
+            var flip = item.get('flipX');
+            item.set('flipX', !flip);
             item.setCoords();
         });
     }
